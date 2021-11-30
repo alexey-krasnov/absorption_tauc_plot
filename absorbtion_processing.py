@@ -59,18 +59,14 @@ def indirect_plot():
 
 # Read initial csv files from the current directory
 for i in glob.glob('*.txt'):
-    df = pd.read_csv(i, sep=",")
-
-    # Calculation of the corresponding energy and Tauc transformation for direct/indirect allowed transition
-    df['Energy, eV'] = 1240 / df['Wavelength (nm)']
-    df['Direct transition'] = (df['Absorbance'] * df['Energy, eV'])**2
-    df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV'])**0.5
-    print(i)
     # Check if you have already run the program for the files
-    if i in glob.glob('*+.txt'):
-        print("You have already generated necessary files")
-        continue
-    else:
+    if i not in glob.glob('*+.txt'):
+        df = pd.read_csv(i, sep=",")
+        # Calculation of the corresponding energy and Tauc transformation for direct/indirect allowed transition
+        df['Energy, eV'] = 1240 / df['Wavelength (nm)']
+        df['Direct transition'] = (df['Absorbance'] * df['Energy, eV'])**2
+        df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV'])**0.5
+        print(i)
         # Export Excel and txt files
         # df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False)
         df.to_csv(i.replace('.txt', '+.txt'), sep=',', index=False)
@@ -84,5 +80,8 @@ for i in glob.glob('*.txt'):
         elif int(n) == 1:
             direct_plot()
             indirect_plot()
+    else:
+        print("You have already generated necessary files")
+        continue
 
 print("Processing of your absorption data is finished!")
