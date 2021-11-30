@@ -32,7 +32,7 @@ for i in glob.glob('*.txt'):
         ax.xaxis.set_minor_locator(ticker.MultipleLocator(10))
         ax.set_ylim(auto=True)  # set y limits manually
 
-        ax.set_title(i.replace('txt', ''))
+        ax.set_title(i.replace('.txt', ''))
         ax.title.set_size(15)
         ax.set_xlabel('λ, nm')
         ax.set_ylabel('F(R), a.u.')
@@ -42,14 +42,14 @@ for i in glob.glob('*.txt'):
         # Plot Tauc plot figures
         n = input("Enter 0 for direct and 1 for indirect semiconductor "
                   "type. "
-                  "Print 1 if you do not have any information")
+                  "Print 1 if you do not have any information. ")
         if int(n) == 0:
             fig = plt.figure()
             ax = fig.add_subplot(111)
             assert isinstance(ax, axes.Axes)
             ax.set_xlim(auto=True)  # set x limits manually
             ax.set_ylim(auto=True)  # set y limits manually
-            ax.set_title(i.replace('txt', ''))
+            ax.set_title(i.replace('.txt', ''))
             ax.title.set_size(15)
             ax.set_xlabel('hν, eV')
             ax.xaxis.set_major_locator(ticker.MultipleLocator(0.2))
@@ -58,7 +58,7 @@ for i in glob.glob('*.txt'):
             ax.plot(df['Energy, eV'], df['Direct transition'])
             plt.savefig(i.replace('.txt', '_direct_Tauc.png'), dpi=300)
 
-        else:
+        elif int(n) == 1:
 
             pass
 
