@@ -5,6 +5,18 @@ import glob
 import matplotlib.ticker as ticker
 
 
+def data_processing():
+    global df
+    """Read initial csv files from the current directory, making Tauc transformation, writing, and exporting data"""
+    df = pd.read_csv(i, sep=",")
+    # Calculation of the corresponding energy and Tauc transformation for direct/indirect allowed transition
+    df['Energy, eV'] = 1240 / df['Wavelength (nm)']
+    df['Direct transition'] = (df['Absorbance'] * df['Energy, eV']) ** 2
+    df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV']) ** 0.5
+    # Export Excel and txt files
+    # df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False)
+    df.to_csv(i.replace('.txt', '+.txt'), sep=',', index=False)
+
 def abs_plot():
     """Plot figure of the absorption spectra"""
     fig = plt.figure()
@@ -14,7 +26,6 @@ def abs_plot():
     ax.xaxis.set_major_locator(ticker.MultipleLocator(100))
     ax.xaxis.set_minor_locator(ticker.MultipleLocator(10))
     ax.set_ylim(auto=True)  # set y limits manually
-
     ax.set_title(i.replace('.txt', ''))
     ax.title.set_size(15)
     ax.set_xlabel('λ, nm')
@@ -59,20 +70,12 @@ def indirect_plot():
 
 # Check if you have already run the program for the files
 if not glob.glob('*+.txt'):
-    # Read initial csv files from the current directory
     for i in glob.glob('*.txt'):
-        df = pd.read_csv(i, sep=",")
-        # Calculation of the corresponding energy and Tauc transformation for direct/indirect allowed transition
-        df['Energy, eV'] = 1240 / df['Wavelength (nm)']
-        df['Direct transition'] = (df['Absorbance'] * df['Energy, eV'])**2
-        df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV'])**0.5
-        print(i)
-        # Export Excel and txt files
-        # df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False)
-        df.to_csv(i.replace('.txt', '+.txt'), sep=',', index=False)
+        # Read initial csv files from the current director
+        data_processing()
         # Plot absorption figures
         abs_plot()
-        # Plot Tauc plot figures
+        # Plot Tauc figures
         n = input(f"Enter 0 or 1 if {i.replace('.txt', '')} is a direct or indirect type semiconductor. "
                   "Enter 1 if you do not have any information. ")
         if int(n) == 0:
