@@ -65,9 +65,9 @@ for i in glob.glob('*.txt'):
     df['Energy, eV'] = 1240 / df['Wavelength (nm)']
     df['Direct transition'] = (df['Absorbance'] * df['Energy, eV'])**2
     df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV'])**0.5
-
+    print(i)
     # Check if you have already run the program for the files
-    if i.replace('.txt', '+.txt') in glob.glob('*+.txt'):
+    if i in glob.glob('*+.txt'):
         print("You have already generated necessary files")
         continue
     else:
