@@ -35,7 +35,7 @@ def direct_plot():
     ax.set_xlabel('hν, eV')
     # ax.xaxis.set_major_locator(ticker.MultipleLocator(0.4))
     # ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.02))
-    ax.set_ylabel('(F(R)·hν)\u00b2')
+    ax.set_ylabel(r'(F(R)·hν)$^{2}$')
     ax.plot(df['Energy, eV'], df['Direct transition'])
     plt.savefig(i.replace('.txt', '_direct_Tauc.png'), dpi=300)
 
@@ -52,7 +52,8 @@ def indirect_plot():
     ax.set_xlabel('hν, eV')
     # ax.xaxis.set_major_locator(ticker.MultipleLocator(0.2))
     # ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.02))
-    ax.set_ylabel('(F(R)·hν)\u00b0.5')
+    ax.set_ylabel(r'(F(R)·hν)$^{1/2}$')
+    # ax.set_ylabel(r'(F(R)·$h\nu)^{1/2}$)')
     ax.plot(df['Energy, eV'], df['Indirect transition'])
     plt.savefig(i.replace('.txt', '_indirect_Tauc.png'), dpi=300)
 
