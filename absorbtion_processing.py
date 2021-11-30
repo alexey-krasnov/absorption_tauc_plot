@@ -67,7 +67,7 @@ def indirect_plot():
     plt.savefig(i.replace('.txt', '_indirect_Tauc.png'), dpi=300)
 
 
-# Check if you have already run the program and got the files
+# Check if you have already run the program and got the files.
 if not glob.glob('*+.txt'):
     for i in glob.glob('*.txt'):
         # Read initial csv files from the current director
@@ -83,8 +83,8 @@ if not glob.glob('*+.txt'):
             direct_plot()  # Plot Tauc both for indirect/direct transitions
             indirect_plot()
         else:
-            print("Please enter 0 ir 1 for direct/indirect type semiconductor")
+            print("Please enter 0 ir 1 for direct/indirect type semiconductor.")
 else:
-    print("You have already generated necessary files")
+    print("You have already generated necessary files.")
 
-print("Processing of your absorption data is finished!")
+print("Processing of your absorption data is finished successfully!")
