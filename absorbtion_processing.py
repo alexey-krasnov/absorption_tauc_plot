@@ -3,20 +3,25 @@ import matplotlib.pyplot as plt
 import matplotlib.axes._axes as axes
 import glob
 
-# Read input data file from the current directory
 
+# Read input csv files from the current directory
 for i in glob.glob('*.txt'):
     df = pd.read_csv(i, sep=",")
+    # Calculation of the corresponding energy and Tauc transformation for direct/indirect allowed transition
     df['Energy, eV'] = 1240 / df['Wavelength (nm)']
     df['Direct transition'] = (df['Absorbance'] * df['Energy, eV'])**2
     df['Indirect transition '] = (df['Absorbance'] * df['Energy, eV'])**0.5
     # print(df)
+
+    # Check if you have already run the program for the files
     if i in glob.glob('*+.txt'):
         print("You have already generated necessary files")
         pass
     else:
-        df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False) # Save data as Excel files
-        df.to_csv(i.replace('.txt', '+.txt'), sep=',', index=False) # Save data as txt files
+        # Export Excel and txt files
+        df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False)
+        df.to_csv(i.replace('.txt', '+.txt'), sep=',', index=False)
+
         # Plot figures 2 method
         fig = plt.figure()
         ax = fig.add_subplot(111)
