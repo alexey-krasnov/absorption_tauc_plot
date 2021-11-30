@@ -56,14 +56,11 @@ def indirect_plot():
     ax.plot(df['Energy, eV'], df['Indirect transition'])
     plt.savefig(i.replace('.txt', '_indirect_Tauc.png'), dpi=300)
 
-# Check if you have already run the program for the files
-# check_file = os.path.exists('*+.txt')
-# print(check_file)
-if not glob.glob('*+.txt'):
 
-# Read initial csv files from the current directory
+# Check if you have already run the program for the files
+if not glob.glob('*+.txt'):
+    # Read initial csv files from the current directory
     for i in glob.glob('*.txt'):
-      # if i.replace('.txt', '+.txt') not in glob.glob('*+.txt'):
         df = pd.read_csv(i, sep=",")
         # Calculation of the corresponding energy and Tauc transformation for direct/indirect allowed transition
         df['Energy, eV'] = 1240 / df['Wavelength (nm)']
