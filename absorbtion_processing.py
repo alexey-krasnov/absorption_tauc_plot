@@ -65,7 +65,6 @@ for i in glob.glob('*.txt'):
     df['Energy, eV'] = 1240 / df['Wavelength (nm)']
     df['Direct transition'] = (df['Absorbance'] * df['Energy, eV'])**2
     df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV'])**0.5
-    print(i)
     # Check if you have already run the program for the files
     if i in glob.glob('*+.txt'):
         print("You have already generated necessary files")
@@ -77,9 +76,8 @@ for i in glob.glob('*.txt'):
         # Plot absorption figures
         abs_plot()
         # Plot Tauc plot figures
-        n = input("Enter 0 for direct and 1 for indirect semiconductor "
-                  "type. "
-                  "Print 1 if you do not have any information. ")
+        n = input(f"Enter 0 or 1 if {i.replace('.txt', '')} is a direct or indirect type semiconductor. "
+                  "Enter 1 if you do not have any information. ")
         if int(n) == 0:
             direct_plot()
         elif int(n) == 1:
