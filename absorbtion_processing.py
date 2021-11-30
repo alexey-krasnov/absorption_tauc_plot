@@ -4,6 +4,7 @@ import matplotlib.axes._axes as axes
 import glob
 import matplotlib.ticker as ticker
 
+
 def abs_plot():
     """Plot figure of the absorption spectra"""
     fig = plt.figure()
@@ -39,7 +40,7 @@ def direct_plot():
     plt.savefig(i.replace('.txt', '_direct_Tauc.png'), dpi=300)
 
 
-def inirect_plot():
+def indirect_plot():
     """Plot figure for indirect transition"""
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -68,7 +69,7 @@ for i in glob.glob('*.txt'):
     # Check if you have already run the program for the files
     if i in glob.glob('*+.txt'):
         print("You have already generated necessary files")
-        else:
+    else:
         # Export Excel and txt files
         df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False)
         df.to_csv(i.replace('.txt', '+.txt'), sep=',', index=False)
@@ -82,6 +83,6 @@ for i in glob.glob('*.txt'):
             direct_plot()
         elif int(n) == 1:
             direct_plot()
-            inirect_plot()
+            indirect_plot()
 
 print("Processing of your absorption data is finished!")
