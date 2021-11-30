@@ -67,11 +67,12 @@ for i in glob.glob('*.txt'):
     df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV'])**0.5
 
     # Check if you have already run the program for the files
-    if i in glob.glob('*+.txt'):
+    if i.replace('.txt', '+.txt') in glob.glob('*+.txt'):
         print("You have already generated necessary files")
+        continue
     else:
         # Export Excel and txt files
-        df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False)
+        # df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False)
         df.to_csv(i.replace('.txt', '+.txt'), sep=',', index=False)
         # Plot absorption figures
         abs_plot()
