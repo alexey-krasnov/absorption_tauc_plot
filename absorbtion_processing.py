@@ -53,7 +53,6 @@ def indirect_plot():
     # ax.xaxis.set_major_locator(ticker.MultipleLocator(0.2))
     # ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.02))
     ax.set_ylabel(r'(F(R)·hν)$^{1/2}$')
-    # ax.set_ylabel(r'(F(R)·$h\nu)^{1/2}$)')
     ax.plot(df['Energy, eV'], df['Indirect transition'])
     plt.savefig(i.replace('.txt', '_indirect_Tauc.png'), dpi=300)
 
@@ -66,6 +65,7 @@ for i in glob.glob('*.txt'):
     df['Energy, eV'] = 1240 / df['Wavelength (nm)']
     df['Direct transition'] = (df['Absorbance'] * df['Energy, eV'])**2
     df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV'])**0.5
+    print(i)
     # Check if you have already run the program for the files
     if i in glob.glob('*+.txt'):
         print("You have already generated necessary files")
