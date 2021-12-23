@@ -5,6 +5,7 @@ import glob
 import matplotlib.ticker as ticker
 import numpy as np
 from scipy.signal import savgol_filter
+from scipy.stats import linregress
 
 
 def data_reading():
@@ -75,8 +76,46 @@ def indirect_plot():
     ax.plot(df['Energy, eV'], df['Indirect transition'])
     plt.savefig(i.replace('.txt', '_indirect_Tauc.png'), dpi=300)
 
-def band_gap():
-    pass
+def direct_band_gap():
+    #  Convert Pandas Series 'Energy, eV' and 'Direct transition' to NumPy arrays
+    x = df['Energy, eV'].to_numpy()
+    y = df['Direct transition'].to_numpy()
+    # Get the 1st differential with smoothing of y functions
+    dx = np.diff(x, 1)
+    dy = np.diff(savgol_filter(y, 51, 3), 1)
+    # Select the global maximum point on the graph of
+    maxindex_dir = np.argmax(dy/dx)
+    x_linear_dir = x[maxindex_dir - 10: maxindex_dir + 10]
+    y_linear = y[maxindex_dir - 10: maxindex_dir + 10]
+    a, b, r_value, p_value, stderr = linregress(x_linear_dir, y_linear)
+    E_dir_band_gap = round(-b / a, 2)
+    print(f"Direct band gap is : {E_dir_band_gap}")
+    # visualization_x = np.linspace(E_dir_band_gap, x[maxindex_dir-60], 2)
+    # plt.scatter(E_dir_band_gap, 0, marker='x', color='k', label="Bandgap = " + str(E_dir_band_gap) + "eV")
+    # plt.plot(x, y)
+    # plt.plot(visualization_x, color='red')
+    # plt.xlabel("Energia")
+    # plt.ylabel("$(alpha h nu)^2$")
+    # plt.title("Tauc plot")
+    # plt.legend()
+    # plt.grid()
+    # plt.show()
+
+
+def indirect_band_gap():
+    #  Convert Pandas Series 'Energy, eV' and 'Inirect transition' to NumPy arrays
+    x = df['Energy, eV'].to_numpy()
+    y = df['Indirect transition'].to_numpy()
+    # Get the 1st differential with smoothing of y functions
+    dx = np.diff(x, 1)
+    dy = np.diff(savgol_filter(y, 51, 3), 1)
+    # Select the global maximum point on the graph of
+    maxindex_dir = np.argmax(dy / dx)
+    x_linear_dir = x[maxindex_dir - 10: maxindex_dir + 10]
+    y_linear = y[maxindex_dir - 10: maxindex_dir + 10]
+    a, b, r_value, p_value, stderr = linregress(x_linear_dir, y_linear)
+    E_indir_band_gap = round(-b / a, 2)
+    print(f"Indirect band gap is : {E_indir_band_gap}")
 
 
 # Check if you have already run the program and got the files.
@@ -97,9 +136,13 @@ if not glob.glob('*+.txt'):
                       "Enter 1 if you do not have any information about type semiconductor. ")
             if int(n) == 0:
                 direct_plot()  # Plot Tauc only for direct transition
+                direct_band_gap()
             elif int(n) == 1:
-                direct_plot()  # Plot Tauc both for indirect/direct transitions
+                # Plot Tauc both for indirect/direct transitions
+                direct_plot()
+                direct_band_gap()
                 indirect_plot()
+                indirect_band_gap()
             else:
                 print("Please enter 0 ir 1 for direct/indirect type semiconductor.")
 else:
