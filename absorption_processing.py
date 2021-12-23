@@ -8,7 +8,6 @@ import matplotlib.ticker as ticker
 def data_reading():
     """Read data from csv files in the current directory, checking id the txt file is proper."""
     global df
-    # Check if the txt file is proper
     df = pd.read_csv(i, sep=",")
 
 
@@ -78,8 +77,9 @@ def indirect_plot():
 # Check if you have already run the program and got the files.
 if not glob.glob('*+.txt'):
     for i in glob.glob('*.txt'):
-        # Read initial csv files from the current director and make calculation
+        # Read initial csv files from the current directory and make calculation
         data_reading()
+        # Check if the txt file is proper
         if 'Wavelength (nm)' not in df.columns.tolist():
             print(f"Check the file {i}. It should contain two columns Wavelength (nm) and Absorbance.")
             continue
