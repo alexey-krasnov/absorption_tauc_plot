@@ -83,7 +83,7 @@ def direct_band_gap():
     # Get the 1st differential with smoothing of y functions
     dx = np.diff(x, 1)
     dy = np.diff(savgol_filter(y, 51, 3), 1)
-    # Select the global maximum point on the graph of
+    # Select the global maximum point on the graph
     maxindex_dir = np.argmax(dy/dx)
     x_linear_dir = x[maxindex_dir - 10: maxindex_dir + 10]
     y_linear = y[maxindex_dir - 10: maxindex_dir + 10]
@@ -109,7 +109,7 @@ def indirect_band_gap():
     # Get the 1st differential with smoothing of y functions
     dx = np.diff(x, 1)
     dy = np.diff(savgol_filter(y, 51, 3), 1)
-    # Select the global maximum point on the graph of
+    # Select the global maximum point on the graph
     maxindex_dir = np.argmax(dy / dx)
     x_linear_dir = x[maxindex_dir - 10: maxindex_dir + 10]
     y_linear = y[maxindex_dir - 10: maxindex_dir + 10]
@@ -128,12 +128,12 @@ if not glob.glob('*+.txt'):
             print(f"Check the file {i}. It should contain two columns Wavelength (nm) and Absorbance.")
             continue
         else:
+            n = input(f"Enter 0 or 1 if {i.replace('.txt', '')} is a direct or indirect type semiconductor."
+                      "Enter 1 if you do not have any information about type semiconductor. ")
             data_processing()
             # Plot figures of the absorption spectra
             absorption_plot()
             # Plot Tauc figures
-            n = input(f"Enter 0 or 1 if {i.replace('.txt', '')} is a direct or indirect type semiconductor."
-                      "Enter 1 if you do not have any information about type semiconductor. ")
             if int(n) == 0:
                 direct_plot()  # Plot Tauc only for direct transition
                 direct_band_gap()
