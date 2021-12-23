@@ -75,6 +75,9 @@ def indirect_plot():
     ax.plot(df['Energy, eV'], df['Indirect transition'])
     plt.savefig(i.replace('.txt', '_indirect_Tauc.png'), dpi=300)
 
+def band_gap():
+    pass
+
 
 # Check if you have already run the program and got the files.
 if not glob.glob('*+.txt'):
