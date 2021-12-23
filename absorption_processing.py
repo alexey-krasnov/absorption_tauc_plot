@@ -5,10 +5,16 @@ import glob
 import matplotlib.ticker as ticker
 
 
+def data_reading():
+    """Read data from csv files in the current directory, checking id the txt file is proper."""
+    global df
+    # Check if the txt file is proper
+    df = pd.read_csv(i, sep=",")
+
+
 def data_processing():
     """Read data from csv files in the current directory, making Tauc transformation, writing, and exporting data."""
     global df
-    df = pd.read_csv(i, sep=",")
     # Calculation of the corresponding energy values and Tauc transformation for direct/indirect allowed transition.
     df['Energy, eV'] = 1240 / df['Wavelength (nm)']
     df['Direct transition'] = (df['Absorbance'] * df['Energy, eV']) ** 2
@@ -17,7 +23,8 @@ def data_processing():
     # df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False)
     df.to_csv(i.replace('.txt', '+.txt'), sep=',', index=False)
 
-def absorbtion_plot():
+
+def absorption_plot():
     """Plot figures of the absorption spectra"""
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -32,6 +39,7 @@ def absorbtion_plot():
     ax.set_ylabel('F(R), a.u.')
     ax.plot(df['Wavelength (nm)'], df['Absorbance'])
     plt.savefig(i.replace('txt', 'png'), dpi=300)
+
 
 def direct_plot():
     """Plot figure for direct transition"""
@@ -70,20 +78,25 @@ def indirect_plot():
 # Check if you have already run the program and got the files.
 if not glob.glob('*+.txt'):
     for i in glob.glob('*.txt'):
-        # Read initial csv files from the current director
-        data_processing()
-        # Plot figures of the absorption spectra
-        absorbtion_plot()
-        # Plot Tauc figures
-        n = input(f"Enter 0 or 1 if {i.replace('.txt', '')} is a direct or indirect type semiconductor."
-                  "Enter 1 if you do not have any information about type semiconductor. ")
-        if int(n) == 0:
-            direct_plot()  # Plot Tauc only for direct transition
-        elif int(n) == 1:
-            direct_plot()  # Plot Tauc both for indirect/direct transitions
-            indirect_plot()
+        # Read initial csv files from the current director and make calculation
+        data_reading()
+        if 'Wavelength (nm)' not in df.columns.tolist():
+            print(f"Check the file {i}. It should contain two columns Wavelength (nm) and Absorbance.")
+            continue
         else:
-            print("Please enter 0 ir 1 for direct/indirect type semiconductor.")
+            data_processing()
+            # Plot figures of the absorption spectra
+            absorption_plot()
+            # Plot Tauc figures
+            n = input(f"Enter 0 or 1 if {i.replace('.txt', '')} is a direct or indirect type semiconductor."
+                      "Enter 1 if you do not have any information about type semiconductor. ")
+            if int(n) == 0:
+                direct_plot()  # Plot Tauc only for direct transition
+            elif int(n) == 1:
+                direct_plot()  # Plot Tauc both for indirect/direct transitions
+                indirect_plot()
+            else:
+                print("Please enter 0 ir 1 for direct/indirect type semiconductor.")
 else:
     print("You have already generated necessary files.")
 
