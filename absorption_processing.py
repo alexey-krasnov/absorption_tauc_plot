@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib.axes._axes as axes
 import glob
 import matplotlib.ticker as ticker
+import numpy as np
+from scipy.signal import savgol_filter
 
 
 def data_reading():
