@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.axes._axes as axes
