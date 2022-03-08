@@ -120,7 +120,9 @@ def indirect_band_gap():
 
 
 # Check if you have already run the program and got the files.
-if not glob.glob('*+.txt'):
+if glob.glob('*+.txt'):
+    print("You have already generated necessary files.")
+else:
     for i in glob.glob('*.txt'):
         # Read initial csv files from the current directory and make calculation
         data_reading()
@@ -146,7 +148,5 @@ if not glob.glob('*+.txt'):
                 indirect_band_gap()
             else:
                 print("Please enter 0 ir 1 for direct/indirect type semiconductor.")
-else:
-    print("You have already generated necessary files.")
 
 print("Processing of your absorption data is finished successfully!")
