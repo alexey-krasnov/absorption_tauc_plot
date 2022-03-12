@@ -7,6 +7,15 @@
 
 > Process UV-Vis absorption spectra, make Tauc transformation for direct/indirect allowed transition, extract band gap values for corresponding  transition type, and plot figures
 
+##  Prerequisites
+
+This package requires:
+
+- [pandas](https://pandas.pydata.org/pandas-docs/stable/index.html)
+- [NumPy](https://docs.scipy.org/doc/numpy/index.html)
+- [Matplotlib](https://matplotlib.org/3.5.1/)
+- [SciPy](https://docs.scipy.org/doc/scipy/)
+
 ## Usage
 `absorption_processing` should be used within a directory containing your raw csv (.txt) files. These files should have the following format:
 ```python
