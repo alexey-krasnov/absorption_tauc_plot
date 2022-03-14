@@ -5,4 +5,3 @@ __pychache__/
 *.pyc
 .DS_Store
 !requirements.txt
-!Examples/
