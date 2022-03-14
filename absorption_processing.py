@@ -34,7 +34,7 @@ def ask_semiconductor_type(file_name: str) -> float:
     return n
 
 
-def data_processing(df, n=2):
+def data_processing(df, n=2.0):
     """Read data from csv files in the current directory, making Tauc transformation, writing, and exporting data.
     Calculation of the corresponding energy values and Tauc transformation for direct/indirect allowed transition."""
     df['Energy, eV'] = 1240 / df['Wavelength (nm)']
@@ -90,18 +90,21 @@ def tauc_plot(df, n: float):
         plt.savefig(file.replace('.txt', '_indirect_Tauc.png'), dpi=300)
 
 
-def direct_band_gap(df, n: float) -> tuple:
+def get_band_gap(df, n: float) -> tuple:
     """Calculate direct band gap value"""
     #  Convert Pandas Series 'Energy, eV', 'Direct transition' or 'Indirect transition' to NumPy arrays
     def direct_series(df):
         return df['Direct transition'].to_numpy()
+
     def indirect_series(df):
         return df['Indirect transition'].to_numpy()
+
     x = df['Energy, eV'].to_numpy()
     # Get the 1st differential with smoothing of y functions
     dx = np.diff(x, 1)
     y = direct_series(df)
     dy = np.diff(savgol_filter(y, 51, 3), 1)
+    # Select the global maximum point on the graph
     maxindex_dir = np.argmax(dy / dx)
     x_linear_dir = x[maxindex_dir - 10: maxindex_dir + 10]
     y_linear = y[maxindex_dir - 10: maxindex_dir + 10]
@@ -111,7 +114,6 @@ def direct_band_gap(df, n: float) -> tuple:
     if n == 0.5:
         y = indirect_series(df)
         dy = np.diff(savgol_filter(y, 51, 3), 1)
-        # Select the global maximum point on the graph
         maxindex_dir = np.argmax(dy / dx)
         x_linear_dir = x[maxindex_dir - 10: maxindex_dir + 10]
         y_linear = y[maxindex_dir - 10: maxindex_dir + 10]
@@ -137,6 +139,7 @@ if __name__ == "__main__":
         # Plot figures of the absorption spectra and Tauc transformation
         absorption_plot(df=processed_df)
         tauc_plot(df=processed_df, n=tauc_indicator)
-        e_g_direct, e_g_indirect = direct_band_gap(df=processed_df, n=tauc_indicator)
+        # Get Eg
+        e_g_direct, e_g_indirect = get_band_gap(df=processed_df, n=tauc_indicator)
         print(e_g_direct, e_g_indirect)
     print("Processing of your absorption data is finished successfully!")
