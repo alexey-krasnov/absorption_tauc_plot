@@ -123,7 +123,7 @@ def indirect_band_gap():
 if glob.glob('*+.txt'):
     print("You have already generated necessary files.")
 else:
-    for i in glob.glob('*.txt'):
+    for i in glob.glob('[!requirements]*.txt'):
         # Read initial csv files from the current directory and make calculation
         data_reading()
         # Check if the txt file is proper
