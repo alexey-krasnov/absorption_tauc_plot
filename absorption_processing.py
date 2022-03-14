@@ -47,7 +47,7 @@ def data_processing(df, n=2.0):
     return df
 
 
-def absorption_plot(df):
+def absorption_plot(df, file_name):
     """Plot figures of the absorption spectra"""
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -56,15 +56,20 @@ def absorption_plot(df):
     ax.xaxis.set_major_locator(ticker.MultipleLocator(100))
     ax.xaxis.set_minor_locator(ticker.MultipleLocator(10))
     ax.set_ylim(auto=True)  # set y limits
-    ax.set_title(file.replace('.txt', ''))
+    ax.set_title(file_name.replace('.txt', ''))
     ax.title.set_size(15)
     ax.set_xlabel('λ, nm')
     ax.set_ylabel('F(R), a.u.')
     ax.plot(df['Wavelength (nm)'], df['Absorbance'])
-    plt.savefig(file.replace('txt', 'png'), dpi=300)
+    plt.savefig(file_name.replace('txt', 'png'), dpi=300)
 
 
-def tauc_plot(df, n: float):
+def tauc_gen(df):
+    for tauc in ['Direct transition', 'Indirect transition']:
+        yield df[tauc]
+
+
+def tauc_plot(x_axis, y_axis, n, file_name):
     """Plot Tauc figure for direct/indirect transition"""
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -76,52 +81,27 @@ def tauc_plot(df, n: float):
     ax.set_xlabel('hν, eV')
     # ax.xaxis.set_major_locator(ticker.MultipleLocator(0.4)) # Set major tick
     # ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.02)) # Set minor tick
-    ax.set_ylabel(r'(F(R)·hν)$^{2}$')
-    ax.plot(df['Energy, eV'], df['Direct transition'])
-    plt.savefig(file.replace('.txt', '_direct_Tauc.png'), dpi=300)
-    if n == 0.5:
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        assert isinstance(ax, axes.Axes)
-        ax.set_xlim(auto=True)  # set x limits manually
-        ax.set_ylim(auto=True)  # set y limits manually
-        ax.set_ylabel(r'(F(R)·hν)$^{1/2}$')
-        ax.plot(df['Energy, eV'], df['Indirect transition'])
-        plt.savefig(file.replace('.txt', '_indirect_Tauc.png'), dpi=300)
+    ax.set_ylabel(rf'(F(R)·hν)$^{n}$')
+    ax.plot(x_axis, y_axis)
+    plt.savefig(file_name.replace('.txt', f'_{y_axis.name}.png'), dpi=300)
 
 
-def get_band_gap(df, n: float) -> tuple:
+def get_band_gap(x_axis, y_axis) -> float:
     """Calculate direct band gap value"""
     #  Convert Pandas Series 'Energy, eV', 'Direct transition' or 'Indirect transition' to NumPy arrays
-    def direct_series(df):
-        return df['Direct transition'].to_numpy()
-
-    def indirect_series(df):
-        return df['Indirect transition'].to_numpy()
-
-    x = df['Energy, eV'].to_numpy()
+    x_numpy = x_axis.to_numpy()
+    y_numpy = y_axis.to_numpy()
     # Get the 1st differential with smoothing of y functions
-    dx = np.diff(x, 1)
-    y = direct_series(df)
-    dy = np.diff(savgol_filter(y, 51, 3), 1)
+    dx = np.diff(x_numpy, 1)
+    dy = np.diff(savgol_filter(y_numpy, 51, 3), 1)
     # Select the global maximum point on the graph
-    maxindex_dir = np.argmax(dy / dx)
-    x_linear_dir = x[maxindex_dir - 10: maxindex_dir + 10]
-    y_linear = y[maxindex_dir - 10: maxindex_dir + 10]
-    a, b, r_value, p_value, stderr = linregress(x_linear_dir, y_linear)
-    e_dir_band_gap = round(-b / a, 2)
-    print(f"Direct band gap is: {e_dir_band_gap}")
-    if n == 0.5:
-        y = indirect_series(df)
-        dy = np.diff(savgol_filter(y, 51, 3), 1)
-        maxindex_dir = np.argmax(dy / dx)
-        x_linear_dir = x[maxindex_dir - 10: maxindex_dir + 10]
-        y_linear = y[maxindex_dir - 10: maxindex_dir + 10]
-        a, b, r_value, p_value, stderr = linregress(x_linear_dir, y_linear)
-        e_indir_band_gap = round(-b / a, 2)
-        print(f"Indirect band gap is: {e_indir_band_gap}")
-        return e_dir_band_gap, e_indir_band_gap
-    return e_dir_band_gap, None
+    maxindex = np.argmax(dy / dx)
+    x_linear = x_numpy[maxindex - 10: maxindex + 10]
+    y_linear = y_numpy[maxindex - 10: maxindex + 10]
+    a, b, r_value, p_value, stderr = linregress(x_linear, y_linear)
+    e_band_gap = round(-b / a, 2)
+    print(f"{y_axis.name} band gap is: {e_band_gap}")
+    return e_band_gap
 
 
 if __name__ == "__main__":
@@ -137,9 +117,11 @@ if __name__ == "__main__":
         tauc_indicator = ask_semiconductor_type(file_name=file)
         processed_df = data_processing(df=initial_df, n=tauc_indicator)
         # Plot figures of the absorption spectra and Tauc transformation
-        absorption_plot(df=processed_df)
-        tauc_plot(df=processed_df, n=tauc_indicator)
-        # Get Eg
-        e_g_direct, e_g_indirect = get_band_gap(df=processed_df, n=tauc_indicator)
-        print(e_g_direct, e_g_indirect)
+        absorption_plot(df=processed_df, file_name=file)
+        # Work with 'Direct/Indirect transition' series from df
+        tauc_series = tauc_gen(df=processed_df)
+        for tauc in tauc_series:
+            tauc_plot(x_axis=processed_df['Energy, eV'], y_axis=tauc, n=tauc_indicator, file_name=file)
+            # Get Eg
+            e_g = get_band_gap(x_axis=processed_df['Energy, eV'], y_axis=tauc)
     print("Processing of your absorption data is finished successfully!")
