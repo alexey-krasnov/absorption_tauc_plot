@@ -65,10 +65,11 @@ def absorption_plot(df, file_name):
 
 
 def tauc_gen(df, n=2.0):
+    """Generation pandas Series depending on type of semiconductor: direct or indirect"""
     if n == 0.5:
         for col_name in ['Direct transition', 'Indirect transition']:
             yield df[col_name]
-    elif n:
+    else:
         yield df['Direct transition']
 
 
@@ -94,7 +95,7 @@ def get_band_gap(x_axis, y_axis) -> float:
     #  Convert Pandas Series 'Energy, eV', 'Direct transition' or 'Indirect transition' to NumPy arrays
     x_numpy = x_axis.to_numpy()
     y_numpy = y_axis.to_numpy()
-    # Get the 1st differential with smoothing of y functions
+    # Get the 1st differential of numpy arrays with smoothing of y functions
     dx = np.diff(x_numpy, 1)
     dy = np.diff(savgol_filter(y_numpy, 51, 3), 1)
     # Select the global maximum point on the graph
@@ -110,12 +111,11 @@ def get_band_gap(x_axis, y_axis) -> float:
 if __name__ == "__main__":
     # Check if you have already run the program and got the files.
     txt_files = glob.glob('[!requirements]*.txt')
-    print(txt_files)
     for file in txt_files:
         if fnmatch.fnmatch(file, '*_out.txt') or file.replace('.txt', '_out.txt') in txt_files:
             print(f"{file} is already processed or generated")
             continue
-        print(f'Running for {file}')
+        print(f'Running for {file}...')
         # Read initial csv files from the current directory and make calculation
         initial_df = data_reading()
         tauc_indicator = ask_semiconductor_type(file_name=file)
