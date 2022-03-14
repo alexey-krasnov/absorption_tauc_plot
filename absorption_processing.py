@@ -22,12 +22,21 @@ def data_reading():
     return df
 
 
-def data_processing(df):
+def ask_semiconductor_type(file_name: str) ->float:
+    """Ask user about semiconductor type. n is an indicator that characterizes the process of optical absorption
+    and is equal to 1/2 and 2 for indirect allowed and direct allowed transitions, respectively."""
+    n = input(f"Enter 2 or 0.5 if {file_name.replace('.txt', '')} is a direct or indirect type semiconductor. \n"
+              f"Enter 0.5 if you do not have any information about type semiconductor: ")
+    return float(n)
+
+
+def data_processing(df, n=2):
     """Read data from csv files in the current directory, making Tauc transformation, writing, and exporting data."""
     # Calculation of the corresponding energy values and Tauc transformation for direct/indirect allowed transition.
     df['Energy, eV'] = 1240 / df['Wavelength (nm)']
-    df['Direct transition'] = (df['Absorbance'] * df['Energy, eV']) ** 2
-    df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV']) ** 0.5
+    df['Direct transition'] = (df['Absorbance'] * df['Energy, eV']) ** n
+    if n == 0.5:
+        df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV']) ** n
     # Export excel and/or txt files, comment-uncomment if necessary.
     # df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False)
     df.to_csv(file.replace('.txt', '_out.txt'), sep=',', index=False)
@@ -50,7 +59,7 @@ def absorption_plot(df):
     plt.savefig(file.replace('txt', 'png'), dpi=300)
 
 
-def direct_plot(df):
+def direct_plot(df, n):
     """Plot Tauc figure for direct transition"""
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -62,31 +71,38 @@ def direct_plot(df):
     ax.set_xlabel('hν, eV')
     # ax.xaxis.set_major_locator(ticker.MultipleLocator(0.4)) # Set major tick
     # ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.02)) # Set minor tick
+    if n == 0.5:
+        ax.set_ylabel(r'(F(R)·hν)$^{1/2}$')
+        ax.plot(df['Energy, eV'], df['Indirect transition'])
+        plt.savefig(file.replace('.txt', '_indirect_Tauc.png'), dpi=300)
     ax.set_ylabel(r'(F(R)·hν)$^{2}$')
     ax.plot(df['Energy, eV'], df['Direct transition'])
     plt.savefig(file.replace('.txt', '_direct_Tauc.png'), dpi=300)
 
+# def indirect_plot(df, n):
+#     """Plot Tauc figure for indirect transition"""
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111)
+#     assert isinstance(ax, axes.Axes)
+#     ax.set_xlim(auto=True)  # set x limits manually
+#     ax.set_ylim(auto=True)  # set y limits manually
+#     ax.set_title(file.replace('.txt', ''))
+#     ax.title.set_size(15)
+#     ax.set_xlabel('hν, eV')
+#     # ax.xaxis.set_major_locator(ticker.MultipleLocator(0.4)) # Set major tick
+#     # ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.02)) # Set minor tick
+#     ax.set_ylabel(r'(F(R)·hν)$^{1/2}$')
+#     ax.plot(df['Energy, eV'], df['Indirect transition'])
+#     plt.savefig(file.replace('.txt', '_indirect_Tauc.png'), dpi=300)
 
-def indirect_plot(df):
-    """Plot Tauc figure for indirect transition"""
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    assert isinstance(ax, axes.Axes)
-    ax.set_xlim(auto=True)  # set x limits manually
-    ax.set_ylim(auto=True)  # set y limits manually
-    ax.set_title(file.replace('.txt', ''))
-    ax.title.set_size(15)
-    ax.set_xlabel('hν, eV')
-    # ax.xaxis.set_major_locator(ticker.MultipleLocator(0.4)) # Set major tick
-    # ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.02)) # Set minor tick
-    ax.set_ylabel(r'(F(R)·hν)$^{1/2}$')
-    ax.plot(df['Energy, eV'], df['Indirect transition'])
-    plt.savefig(file.replace('.txt', '_indirect_Tauc.png'), dpi=300)
 
-
-def direct_band_gap(df):
+def direct_band_gap(df, n) -> float:
     """Calculate direct band gap value"""
     #  Convert Pandas Series 'Energy, eV' and 'Direct transition' to NumPy arrays
+    def chose_tauc_series(df):
+        if n == 0.5:
+            return df['Indirect transition']
+        return
     x = df['Energy, eV'].to_numpy()
     y = df['Direct transition'].to_numpy()
     # Get the 1st differential with smoothing of y functions
@@ -99,6 +115,7 @@ def direct_band_gap(df):
     a, b, r_value, p_value, stderr = linregress(x_linear_dir, y_linear)
     e_dir_band_gap = round(-b / a, 2)
     print(f"Direct band gap is: {e_dir_band_gap}")
+    return e_dir_band_gap
     # visualization_x = np.linspace(E_dir_band_gap, x[maxindex_dir-60], 2)
     # plt.scatter(E_dir_band_gap, 0, marker='x', color='k', label="Band gap = " + str(E_dir_band_gap) + "eV")
     # plt.plot(x, y)
@@ -111,7 +128,7 @@ def direct_band_gap(df):
     # plt.show()
 
 
-def indirect_band_gap(df):
+def indirect_band_gap(df) -> float:
     """Calculate indirect band gap value"""
     #  Convert Pandas Series 'Energy, eV' and 'Inirect transition' to NumPy arrays
     x = df['Energy, eV'].to_numpy()
@@ -126,19 +143,23 @@ def indirect_band_gap(df):
     a, b, r_value, p_value, stderr = linregress(x_linear_dir, y_linear)
     e_indir_band_gap = round(-b / a, 2)
     print(f"Indirect band gap is: {e_indir_band_gap}")
+    return e_indir_band_gap
 
 
 if __name__ == "__main__":
     # Check if you have already run the program and got the files.
-    for file in glob.glob('[!requirements]*.txt'):
-        if fnmatch.fnmatch(file, '*_out.txt'):
+    txt_files = glob.glob('[!requirements]*.txt')
+    for file in txt_files:
+        if fnmatch.fnmatch(file, '*_out.txt') or file.replace('.txt', '_out.txt') in txt_files:
+            print(f"{file} is already processed or generated")
             continue
         print(f'Running for {file}')
         # Read initial csv files from the current directory and make calculation
         current_df = data_reading()
-        n = input(f"Enter 0 or 1 if {file.replace('.txt', '')} is a direct or indirect type semiconductor."
-                  "Enter 1 if you do not have any information about type semiconductor: ")
+        # n = input(f"Enter 0 or 1 if {file.replace('.txt', '')} is a direct or indirect type semiconductor."
+        #           "Enter 1 if you do not have any information about type semiconductor: ")
         data_processing(df=current_df)
+        tauc_indicator = ask_semiconductor_type()
         # Plot figures of the absorption spectra
         absorption_plot(df=current_df)
         # Plot Tauc figures
