@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to Absorption_spectra_processing 👋</h1>
+<h1 align="center">Welcome to absorption_tauc_plot 👋</h1>
 <p>
   <a href="https://twitter.com/AlekseiKrasnov4" target="_blank">
     <img alt="Twitter: AlekseiKrasnov4" src="https://img.shields.io/twitter/follow/AlekseiKrasnov4.svg?style=social" />
@@ -50,4 +50,4 @@ There are other codes that can make Tauc transformation and band gap extractrion
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/alexey-krasnov/Absorption_Tauc_plot/issues). 
+Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/alexey-krasnov/absorption_tauc_plot/issues). 
