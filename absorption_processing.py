@@ -30,18 +30,18 @@ def ask_semiconductor_type(file_name: str) -> float:
         n = float(input(f"Enter 2 or 0.5 if {file_name.replace('.txt', '')} "
                         f"is a direct or indirect type semiconductor. \n"
                         f"Enter 0.5 if you do not have any information about type semiconductor: "))
+        return n
     except ValueError:
-        print("The values should be only digits, e.g. 2 or 0.5")
-    return n
+        print("The values should be only digits equal to 2 or 0.5")
 
 
-def data_processing(df, n=2.0):
+def data_processing(df, n):
     """Read data from csv files in the current directory, making Tauc transformation, writing, and exporting data.
     Calculation of the corresponding energy values and Tauc transformation for direct/indirect allowed transition."""
     df['Energy, eV'] = 1240 / df['Wavelength (nm)']
     df['Direct transition'] = (df['Absorbance'] * df['Energy, eV']) ** 2
     if n == 0.5:
-        df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV']) ** 0.5
+        df['Indirect transition'] = (df['Absorbance'] * df['Energy, eV']) ** n
     # Export excel and/or txt files, comment-uncomment if necessary.
     # df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False)
     df.to_csv(file.replace('.txt', '_out.txt'), sep=',', index=False)
@@ -65,7 +65,7 @@ def absorption_plot(df, file_name):
     plt.savefig(file_name.replace('txt', 'png'), dpi=300)
 
 
-def tauc_gen(df, n=2.0):
+def tauc_gen(df, n):
     """Generator of pandas Series from processed Data Frame
     depending on type of semiconductor: direct or indirect """
     if n == 0.5:
@@ -113,6 +113,7 @@ def get_band_gap(x_axis, y_axis) -> float:
 if __name__ == "__main__":
     # Check if you have already run the program and got the files.
     txt_files = glob.glob('[!requirements]*.txt')
+    print(txt_files)
     for file in txt_files:
         if fnmatch.fnmatch(file, '*_out.txt') or file.replace('.txt', '_out.txt') in txt_files:
             print(f"{file} is already processed or generated")
@@ -122,6 +123,9 @@ if __name__ == "__main__":
         initial_df = data_reading()
         # Get the type of semiconductor from user to determine Tauc indicator
         tauc_indicator = ask_semiconductor_type(file_name=file)
+        if tauc_indicator not in {0.5, 2}:
+            print("The Tauc indicator should be only equal to 0.5 or 2.\nProgram is stopping...")
+            break
         processed_df = data_processing(df=initial_df, n=tauc_indicator)
         # Plot figures of the absorption spectra and Tauc transformation
         absorption_plot(df=processed_df, file_name=file)
@@ -131,4 +135,5 @@ if __name__ == "__main__":
             tauc_plot(x_axis=processed_df['Energy, eV'], y_axis=tauc, file_name=file)
             # Extract Eg value
             e_g = get_band_gap(x_axis=processed_df['Energy, eV'], y_axis=tauc)
-    print("Processing of your absorption data is finished successfully!")
+    else:
+        print("Processing of your absorption data is finished successfully!")
