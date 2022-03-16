@@ -23,8 +23,9 @@ def data_reading():
 
 
 def ask_semiconductor_type(file_name: str) -> float:
-    """Ask user about semiconductor type. n is an indicator that characterizes the process of optical absorption
-    and is equal to 1/2 and 2 for indirect allowed and direct allowed transitions, respectively."""
+    """Ask user about semiconductor type.
+    n is an indicator that characterizes the process of optical absorption
+    and n is equal to 1/2 and 2 for indirect/direct allowed transitions."""
     try:
         n = float(input(f"Enter 2 or 0.5 if {file_name.replace('.txt', '')} "
                         f"is a direct or indirect type semiconductor. \n"
@@ -65,7 +66,8 @@ def absorption_plot(df, file_name):
 
 
 def tauc_gen(df, n=2.0):
-    """Generation pandas Series depending on type of semiconductor: direct or indirect"""
+    """Generator of pandas Series from processed Data Frame
+    depending on type of semiconductor: direct or indirect """
     if n == 0.5:
         for col_name in ['Direct transition', 'Indirect transition']:
             yield df[col_name]
@@ -92,7 +94,7 @@ def tauc_plot(x_axis, y_axis, file_name):
 
 def get_band_gap(x_axis, y_axis) -> float:
     """Calculate direct band gap value"""
-    #  Convert Pandas Series 'Energy, eV', 'Direct transition' or 'Indirect transition' to NumPy arrays
+    #  Convert Pandas Series 'Energy, eV'; 'Direct transition' or 'Indirect transition' to NumPy arrays
     x_numpy = x_axis.to_numpy()
     y_numpy = y_axis.to_numpy()
     # Get the 1st differential of numpy arrays with smoothing of y functions
@@ -118,14 +120,15 @@ if __name__ == "__main__":
         print(f'Running for {file}...')
         # Read initial csv files from the current directory and make calculation
         initial_df = data_reading()
+        # Get the type of semiconductor from user to determine Tauc indicator
         tauc_indicator = ask_semiconductor_type(file_name=file)
         processed_df = data_processing(df=initial_df, n=tauc_indicator)
         # Plot figures of the absorption spectra and Tauc transformation
         absorption_plot(df=processed_df, file_name=file)
-        # Work with 'Direct/Indirect transition' series from df
+        # Work with 'Direct/Indirect transition' series from DataFrame
         tauc_series = tauc_gen(df=processed_df, n=tauc_indicator)
         for tauc in tauc_series:
             tauc_plot(x_axis=processed_df['Energy, eV'], y_axis=tauc, file_name=file)
-            # Get Eg
+            # Extract Eg value
             e_g = get_band_gap(x_axis=processed_df['Energy, eV'], y_axis=tauc)
     print("Processing of your absorption data is finished successfully!")
