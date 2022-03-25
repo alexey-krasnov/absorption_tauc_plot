@@ -24,15 +24,24 @@ def data_reading():
 
 def ask_semiconductor_type(file_name: str) -> float:
     """Ask user about semiconductor type.
-    n is an indicator that characterizes the process of optical absorption
-    and n is equal to 1/2 and 2 for indirect/direct allowed transitions."""
-    try:
-        n = float(input(f"Enter 2 or 0.5 if {file_name.replace('.txt', '')} "
+    n is an indicator that characterizes the process of optical absorption,
+    and n is equal to 0.5 or 2 for indirect/direct allowed transitions."""
+    while True:
+        try:
+            n = float(input(f"Enter 2 or 0.5 if {file_name.replace('.txt', '')} "
                         f"is a direct or indirect type semiconductor. \n"
-                        f"Enter 0.5 if you do not have any information about type semiconductor: "))
-        return n
-    except ValueError:
-        print("The values should be only digits equal to 2 or 0.5")
+                        f"Enter 0.5 if you do not have any information about semiconductor type: "))
+            if n in {0.5, 2}:
+                break
+            else:
+                print("Warning!!!The Tauc indicator should be only equal to 0.5 or 2.")
+                continue
+        except ValueError:
+            print("The values should be only digits equal to 2 or 0.5")
+    return n
+
+
+
 
 
 def data_processing(df, n):
@@ -111,9 +120,10 @@ def get_band_gap(x_axis, y_axis) -> float:
 
 
 if __name__ == "__main__":
-    # Check if you have already run the program and got the files.
-    txt_files = glob.glob('[!requirements]*.txt')
+    # Exclude 'requirements.txt' file from processing
+    txt_files = [f for f in glob.glob('*.txt') if not f == 'requirements.txt']
     print(txt_files)
+    # Check if you have already run the program and got the files.
     for file in txt_files:
         if fnmatch.fnmatch(file, '*_out.txt') or file.replace('.txt', '_out.txt') in txt_files:
             print(f"{file} is already processed or generated")
@@ -123,9 +133,7 @@ if __name__ == "__main__":
         initial_df = data_reading()
         # Get the type of semiconductor from user to determine Tauc indicator
         tauc_indicator = ask_semiconductor_type(file_name=file)
-        if tauc_indicator not in {0.5, 2}:
-            print("The Tauc indicator should be only equal to 0.5 or 2.\nProgram is stopping...")
-            break
+        print(tauc_indicator)
         processed_df = data_processing(df=initial_df, n=tauc_indicator)
         # Plot figures of the absorption spectra and Tauc transformation
         absorption_plot(df=processed_df, file_name=file)
