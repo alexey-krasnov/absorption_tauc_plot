@@ -65,7 +65,7 @@ def absorption_plot(df, file_name):
     ax.set_xlim(250, 700)  # set x limits
     ax.xaxis.set_major_locator(ticker.MultipleLocator(100))
     ax.xaxis.set_minor_locator(ticker.MultipleLocator(10))
-    ax.set_ylim(auto=True)  # set y limits
+    ax.set_ylim(auto=True)  # set y limits at 0
     ax.set_title(file_name.replace('.txt', ''))
     ax.title.set_size(15)
     ax.set_xlabel('λ, nm')
@@ -84,13 +84,51 @@ def tauc_gen(df, n):
         yield df['Direct transition']
 
 
-def tauc_plot(x_axis, y_axis, file_name):
+def linearization(x_axis, y_axis):
+    #  Convert Pandas Series 'Energy, eV'; 'Direct transition'/'Indirect transition' to NumPy arrays
+    x_numpy = x_axis.to_numpy()
+    y_numpy = y_axis.to_numpy()
+    # Smooth y line
+    y_smooth = savgol_filter(y_numpy, 51, 3)
+    # Get the 1st differential of numpy arrays with smoothing of y functions
+    dx = np.diff(x_numpy, 1)
+    dy = np.diff(y_smooth, 1)
+    # Select the global maximum point on the graph, smooth dy/dx plot
+    max_index = np.argmax(savgol_filter(dy / dx, 101, 3))
+
+    x_linear = x_numpy[max_index - 10: max_index + 10]
+    y_linear = y_smooth[max_index - 10: max_index + 10]
+    return x_linear, y_linear, max_index
+
+
+def calc_linear_coeff(x_linear, y_linear):
+    a, b, r_value, p_value, stderr = linregress(x_linear, y_linear)
+    return a, b, r_value, p_value, stderr
+
+
+def calc_band_gap(a, b, y_axis):
+    """Calculate direct/indirect band gap value"""
+    e_band_gap = round(-b / a, 2)
+    print(f"{y_axis.name} band gap is: {e_band_gap}")
+    return e_band_gap
+
+
+def vizual_x(e_g, x_axis, max_index):
+    visualization_x = np.linspace(e_g, x_axis[max_index - 60], 2)
+    return visualization_x
+
+
+def func(visualization_x, a, b):
+    return a*visualization_x + b
+
+
+def tauc_plot(x_axis, y_axis, file_name, e_g, a, b, visualization_x):
     """Plot Tauc figure for direct/indirect transition"""
     fig = plt.figure()
     ax = fig.add_subplot(111)
     assert isinstance(ax, axes.Axes)
     ax.set_xlim(auto=True)  # set x limits manually
-    ax.set_ylim(auto=True)  # set y limits manually
+    ax.set_ylim(ymin=0, auto=True)  # set y limits manually at 0
     ax.set_title(file.replace('.txt', ''))
     ax.title.set_size(15)
     ax.set_xlabel('hν, eV')
@@ -98,25 +136,9 @@ def tauc_plot(x_axis, y_axis, file_name):
     # ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.02)) # Set minor tick
     ax.set_ylabel(y_axis.name)
     ax.plot(x_axis, y_axis)
+    ax.scatter(e_g, 0, marker='x', color='k', label=f"Band gap {e_g} eV")
+    ax.plot(visualization_x, func(visualization_x, a, b), color='red')
     plt.savefig(file_name.replace('.txt', f'_{y_axis.name}.png'), dpi=300)
-
-
-def get_band_gap(x_axis, y_axis) -> float:
-    """Calculate direct band gap value"""
-    #  Convert Pandas Series 'Energy, eV'; 'Direct transition' or 'Indirect transition' to NumPy arrays
-    x_numpy = x_axis.to_numpy()
-    y_numpy = y_axis.to_numpy()
-    # Get the 1st differential of numpy arrays with smoothing of y functions
-    dx = np.diff(x_numpy, 1)
-    dy = np.diff(savgol_filter(y_numpy, 51, 3), 1)
-    # Select the global maximum point on the graph
-    max_index = np.argmax(dy / dx)
-    x_linear = x_numpy[max_index - 10: max_index + 10]
-    y_linear = y_numpy[max_index - 10: max_index + 10]
-    a, b, r_value, p_value, stderr = linregress(x_linear, y_linear)
-    e_band_gap = round(-b / a, 2)
-    print(f"{y_axis.name} band gap is: {e_band_gap}")
-    return e_band_gap
 
 
 if __name__ == "__main__":
@@ -140,8 +162,10 @@ if __name__ == "__main__":
         # Work with 'Direct/Indirect transition' series from DataFrame
         tauc_series = tauc_gen(df=processed_df, n=tauc_indicator)
         for tauc in tauc_series:
-            tauc_plot(x_axis=processed_df['Energy, eV'], y_axis=tauc, file_name=file)
-            # Extract Eg value
-            e_g = get_band_gap(x_axis=processed_df['Energy, eV'], y_axis=tauc)
+            x_linear, y_linear, max_index = linearization(x_axis=processed_df['Energy, eV'], y_axis=tauc)
+            a, b, r_value, p_value, stderr = calc_linear_coeff(x_linear, y_linear)
+            e_g = calc_band_gap(a, b, y_axis=tauc)
+            visualization_x = vizual_x(e_g, x_axis=processed_df['Energy, eV'], max_index=max_index)
+            tauc_plot(processed_df['Energy, eV'], tauc, file, e_g, a, b,visualization_x)
     else:
         print("Processing of your absorption data is finished successfully!")
