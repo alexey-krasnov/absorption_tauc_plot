@@ -17,7 +17,7 @@ This package requires:
 - [SciPy](https://docs.scipy.org/doc/scipy/)
 
 ## Usage
-`absorption_processing` should be used within a directory containing your raw csv (.txt) files. These files should have the following format:
+`absorption_processing` should be used within a directory containing your raw txt files. The files could be with comma or space separatad values. These files should have the following format:
 ```python
 "Wavelength nm." "Abs."
 X1 Y1
@@ -26,8 +26,9 @@ X2 Y2
  .  .
  .  .
 ```
-where Xi and Yi are the recorded wavelengths and absorption coefficients (Kubelka-Munk function), respectively. 
-Within the directory containing csv (.txt) files files, run:
+where Xi and Yi are the recorded wavelengths and absorption coefficients (Kubelka-Munk function), respectively. If you have reflectance data instead of absorption coefficients, the programm will ask you and make nessesary Kubelka-Munk transformation.
+
+Within the directory containing txt files files, run:
 ```sh
 absorption_processing.py
 ```
