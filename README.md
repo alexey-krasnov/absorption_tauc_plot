@@ -26,7 +26,7 @@ X2 Y2
  .  .
  .  .
 ```
-where Xi and Yi are the recorded wavelengths and absorption coefficients (Kubelka-Munk function), respectively. If you have reflectance data instead of absorption coefficients, the programm will ask you and make nessesary Kubelka-Munk transformation.
+where Xi and Yi are the recorded wavelengths and absorption coefficients (Kubelka-Munk function), respectively. If you have reflectance data instead of absorption coefficients, the programm will ask you and make necessary Kubelka-Munk transformation.
 
 Within the directory containing txt files files, run:
 ```sh
