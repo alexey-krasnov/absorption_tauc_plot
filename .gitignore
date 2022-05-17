@@ -6,3 +6,4 @@ __pychache__/
 .DS_Store
 !requirements.txt
 !Examples/*
+*.dat

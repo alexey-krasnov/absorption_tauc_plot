@@ -15,10 +15,22 @@ from scipy.stats import linregress
 
 
 def data_reading():
-    """Read data from csv files in the current directory, return DataFrame.
-    Assign proper column names as 'Wavelength (nm)', 'Absorbance'."""
+    """Read data from csv files in the current directory, make Kubelka-Munk transformation
+     if it needs, return DataFrame. Assign proper column names as 'Wavelength (nm)', 'Absorbance'."""
     column_names = ['Wavelength (nm)', 'Absorbance']
-    df = pd.read_csv(file, header=0, names=column_names, sep=",")
+    # Data could be separated by comma or spase
+    df = pd.read_csv(file, header=0, names=column_names, sep=r"\s+|,", engine='python')
+    while True:
+        answer = input("Is your data in the form of 'Wavelength (nm)', 'Absorbance'? Enter 1 if so or 0 if not")
+        if answer == '0':
+            # Make Kubelka-Munk transformation from reflectance to absorbance
+            df['Absorbance'] = (1 - df['Absorbance']/100)**2 / (2 * df['Absorbance']/100)
+            break
+        elif answer not in ('0', '1'):
+            print('Please, enter just 1 or 0')
+            continue
+        else:
+            break
     return df
 
 
@@ -142,16 +154,9 @@ def tauc_plot(x_axis, y_axis, file_name, e_g, a, b, visualization_x):
     plt.savefig(file_name.replace('.txt', f'_{y_axis.name}.png'), dpi=300)
 
 
-# def save_database(file_name: str, e_g: float):
-#     """Save Eg values in the csv file"""
-
-
-
-
 if __name__ == "__main__":
     # Exclude 'requirements.txt' file from processing
     txt_files = [f for f in glob.glob('*.txt') if not f == 'requirements.txt']
-    print(txt_files)
     # Check if you have already run the program and got the files.
     for file in txt_files:
         if fnmatch.fnmatch(file, '*_out.txt') or file.replace('.txt', '_out.txt') in txt_files:
