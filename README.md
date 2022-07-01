@@ -26,19 +26,19 @@ X2 Y2
  .  .
  .  .
 ```
-where Xi and Yi are the recorded wavelengths and absorption coefficients (Kubelka-Munk function), respectively. If you have reflectance data instead of absorption coefficients, the programm will ask you and make necessary Kubelka-Munk transformation.
+where Xi and Yi are the recorded wavelengths and absorption coefficients (Kubelka-Munk function), respectively. If you have reflectance data instead of absorption coefficients, the program will ask you and make the necessary Kubelka-Munk transformation.
 
-Within the directory containing txt files files, run:
+Within the directory containing txt files, run:
 ```sh
 absorption_processing.py
 ```
-The program asks to specify the semiconductor type. Enter 0 for direct; 1 for indirect or if you do not have any information about type semiconductor. The program creates txt file with data in 5 columns: Wavelength (nm), Absorbance,  Energy, eV, Direct transition, Indirect transition, for further plotting of the figures. The corresponding figures of the absorption spectra, Tauc plot for direct/indirect transition for each sample are generated. The band gap value for direct/indirect allowed transition will be extracted.
+The program asks to specify the semiconductor type. Enter 0 for direct; 1 for indirect or if you do not have any information about the type of semiconductor. The program creates txt file with data in 5 columns: Wavelength (nm), Absorbance,  Energy, eV, Direct transition, Indirect transition, for further plotting of the figures. The corresponding figures of the absorption spectra and Tauc plot for direct/indirect transition for each sample are generated. The band gap value for direct/indirect allowed transition will be extracted.
 
-## Other codes for Tauc transformation and band gap extractrion
+## Other codes for Tauc transformation and band gap extraction
 
-There are other codes that can make Tauc transformation and band gap extractrion. The best code depends on your use case. 
-- You may find [taucauto](https://github.com/LiamWilbraham/taucauto) for automatically extract the bandgap of a material by the Tauc method. 
-- A detailed explanation of Tauc transformation process and band gap extraction could be find here [Band Gap Calculation with Python](https://gepac.github.io/2019-06-07-projeto-bandGap/).
+There are other codes that can make Tauc transformation and band gap extraction. The best code depends on your use case. 
+- You may find [taucauto](https://github.com/LiamWilbraham/taucauto) for automatically extracting the bandgap of a material by the Tauc method. 
+- A detailed explanation of the Tauc transformation process and band gap extraction could be found here [Band Gap Calculation with Python](https://gepac.github.io/2019-06-07-projeto-bandGap/).
 
 ## Author
 
@@ -51,4 +51,4 @@ There are other codes that can make Tauc transformation and band gap extractrion
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/alexey-krasnov/absorption_tauc_plot/issues). 
+Contributions, issues, and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/alexey-krasnov/absorption_tauc_plot/issues). 
