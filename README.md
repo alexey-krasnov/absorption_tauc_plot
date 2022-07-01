@@ -44,10 +44,10 @@ There are other codes that can make Tauc transformation and band gap extraction.
 
 👤 **Aleksei Krasnov**
 
-* Website: https://www.researchgate.net/profile/Aleksei-Krasnov
+* Website: [Ph.D. Aleksei Krasnov](https://www.researchgate.net/profile/Aleksei-Krasnov)
 * Twitter: [@AlekseiKrasnov4](https://twitter.com/AlekseiKrasnov4)
-* Github: [@alexey-krasnov](https://github.com/alexey-krasnov)
-* LinkedIn: [@aleksei-krasnov-b53b2ab6](https://linkedin.com/in/aleksei-krasnov-b53b2ab6)
+* Github: [alexey-krasnov](https://github.com/alexey-krasnov)
+* LinkedIn: [Aleksei Krasnov](https://linkedin.com/in/aleksei-krasnov-b53b2ab6)
 
 ## 🤝 Contributing
 
