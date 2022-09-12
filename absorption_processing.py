@@ -21,7 +21,7 @@ def data_reading():
     # Data could be separated by comma or spase
     df = pd.read_csv(file, header=0, names=column_names, sep=r"\s+|,", engine='python')
     while True:
-        answer = input("Is your data in the form of 'Wavelength (nm)', 'Absorbance'? Enter 1 if so or 0 if not")
+        answer = input("Is your data in the form of 'Wavelength (nm)', 'Absorbance'? Enter 1 if so or 0 if not: ")
         if answer == '0':
             # Make Kubelka-Munk transformation from reflectance to absorbance
             df['Absorbance'] = (1 - df['Absorbance']/100)**2 / (2 * df['Absorbance']/100)
@@ -101,8 +101,8 @@ def linearization(x_axis, y_axis):
     # Smooth y line
     y_smooth = savgol_filter(y_numpy, 51, 3)
     # Get the 1st differential of numpy arrays with smoothing of y functions
-    dx = np.diff(x_numpy, 1)
-    dy = np.diff(y_smooth, 1)
+    dx = np.diff(x_numpy)
+    dy = np.diff(y_smooth)
     # Select the global maximum point on the graph, smooth dy/dx plot
     max_index = np.argmax(savgol_filter(dy / dx, 101, 3))
     x_linear = x_numpy[max_index - 10: max_index + 10]
