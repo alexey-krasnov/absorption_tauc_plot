@@ -14,7 +14,7 @@ from scipy.signal import savgol_filter
 from scipy.stats import linregress
 
 
-def data_reading():
+def data_reading() -> pd.DataFrame:
     """Read data from csv files in the current directory, make Kubelka-Munk transformation
      if it needs, return DataFrame. Assign proper column names as 'Wavelength (nm)', 'Absorbance'."""
     column_names = ['Wavelength (nm)', 'Absorbance']
@@ -53,7 +53,7 @@ def ask_semiconductor_type(file_name: str) -> float:
     return n
 
 
-def data_processing(df, n):
+def data_processing(df: pd.DataFrame, n: float) -> pd.DataFrame:
     """Read data from csv files in the current directory, making Tauc transformation, writing, and exporting data.
     Calculation of the corresponding energy values and Tauc transformation for direct/indirect allowed transition."""
     df['Energy (eV)'] = 1240 / df['Wavelength (nm)']
@@ -66,7 +66,7 @@ def data_processing(df, n):
     return df
 
 
-def absorption_plot(df, file_name):
+def absorption_plot(df: pd.DataFrame, file_name: str) -> None:
     """Plot figures of the absorption spectra"""
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -83,7 +83,7 @@ def absorption_plot(df, file_name):
     plt.savefig(file_name.replace('txt', 'png'), dpi=300)
 
 
-def tauc_generator(df, n):
+def tauc_generator(df: pd.DataFrame, n: float):
     """Generator of pandas Series from processed Data Frame
     depending on type of semiconductor: direct or indirect """
     if n == 0.5:
@@ -93,7 +93,7 @@ def tauc_generator(df, n):
         yield df['Direct transition']
 
 
-def linearization(x_axis, y_axis):
+def linearization(x_axis: pd.Series, y_axis: pd.Series) -> tuple[float]:
     """Make linearization of 'Direct transition'/'Indirect transition' plot vs energy"""
     #  Convert Pandas Series 'Energy (eV)'; 'Direct transition'/'Indirect transition' to NumPy arrays
     x_numpy = x_axis.to_numpy()
@@ -110,26 +110,26 @@ def linearization(x_axis, y_axis):
     return x_linear, y_linear, max_index
 
 
-def calc_linear_coeff(x_linear, y_linear) -> tuple:
+def calc_linear_coeff(x_linear: float, y_linear: float) -> tuple[float]:
     """Calculate a regression line and return its coefficients"""
     a, b, r_value, p_value, stderr = linregress(x_linear, y_linear)
     return a, b, r_value, p_value, stderr
 
 
-def calc_band_gap(a, b, y_axis) -> float:
+def calc_band_gap(a: float, b: float, y_axis: pd.Series) -> float:
     """Calculate direct/indirect band gap value"""
     e_band_gap = round(-b / a, 2)
     print(f"{y_axis.name} band gap is: {e_band_gap}")
     return e_band_gap
 
 
-def vizual_x(e_g, x_axis, max_index):
+def vizual_x(e_g: float, x_axis, max_index):
     """Return region of abscissa to plot a regression line"""
     visualization_x = np.linspace(e_g, x_axis[max_index - 60], 2)
     return visualization_x
 
 
-def func(visualization_x, a, b):
+def func(visualization_x, a: float, b: float):
     """Define and return a regression line function as 'y = a*x + b' """
     return a*visualization_x + b
 
@@ -167,7 +167,6 @@ if __name__ == "__main__":
         initial_df = data_reading()
         # Get the type of semiconductor from user to determine Tauc indicator
         tauc_indicator = ask_semiconductor_type(file_name=file)
-        print(tauc_indicator)
         processed_df = data_processing(df=initial_df, n=tauc_indicator)
         # Plot figures of the absorption spectra and Tauc transformation
         absorption_plot(df=processed_df, file_name=file)
