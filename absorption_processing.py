@@ -14,35 +14,39 @@ from scipy.signal import savgol_filter
 from scipy.stats import linregress
 
 
-def data_reading() -> pd.DataFrame:
-    """Read data from csv files in the current directory, make Kubelka-Munk transformation
-     if it needs, return DataFrame. Assign proper column names as 'Wavelength (nm)', 'Absorbance'."""
+def data_reading(file_name: str) -> pd.DataFrame:
+    """Read data from csv files in the current directory.
+    Make Kubelka-Munk transformation if the data in form 'Wavelength (nm)', 'Reflectance'.
+    Return DataFrame with two properly assigned column names as 'Wavelength (nm)', 'Absorbance'"""
     column_names = ['Wavelength (nm)', 'Absorbance']
     # Data could be separated by comma or spase
-    df = pd.read_csv(file, header=0, names=column_names, sep=r"\s+|,", engine='python')
+    df = pd.read_csv(file_name, header=0, names=column_names, sep=r"\s+|,", engine='python')
     while True:
-        answer = input("Is your data in the form of 'Wavelength (nm)', 'Absorbance'? Enter 1 if so or 0 if not: ")
+        answer = input("Is your data in the form of 'Wavelength (nm)', 'Absorbance'? Enter 1 if so or 0 if the data in form 'Wavelength (nm)', 'Reflectance': ")
         if answer == '0':
-            # Make Kubelka-Munk transformation from reflectance to absorbance
+            # Make Kubelka-Munk transformation from reflectance to absorbance if data is in the form of Reflectance
             df['Absorbance'] = (1 - df['Absorbance']/100)**2 / (2 * df['Absorbance']/100)
             break
         elif answer not in ('0', '1'):
-            print('Please, enter just 1 or 0')
+            print('Please, enter just 1 or 0.')
             continue
         else:
             break
+    print('If your data in other formats please feel free to contact with developer through the issue page: '
+          'https://github.com/alexey-krasnov/absorption_tauc_plot/issues')
     return df
 
 
 def ask_semiconductor_type(file_name: str) -> float:
     """Ask user about semiconductor type.
-    n is an indicator that characterizes the process of optical absorption,
-    and n is equal to 0.5 or 2 for indirect/direct allowed transitions."""
+    n is an indicator that characterizes the process of optical absorption.
+    n: 0.5 for indirect allowed transition
+    n: 2 for direct allowed transition"""
     while True:
         try:
             n = float(input(f"Enter 2 or 0.5 if {file_name.replace('.txt', '')} "
-                        f"is a direct or indirect type semiconductor. \n"
-                        f"Enter 0.5 if you do not have any information about semiconductor type: "))
+                            f"is a direct or indirect type semiconductor. \n"
+                            f"Enter 0.5 if you do not have any information about semiconductor type: "))
             if n in {0.5, 2}:
                 break
             else:
@@ -54,16 +58,17 @@ def ask_semiconductor_type(file_name: str) -> float:
 
 
 def data_processing(df: pd.DataFrame, n: float) -> pd.DataFrame:
-    """Read data from csv files in the current directory, making Tauc transformation, writing, and exporting data.
-    Calculation of the corresponding energy values and Tauc transformation for direct/indirect allowed transition."""
+    """Calculation of the corresponding energy values  and Tauc transformation for direct/indirect allowed transition. Add new Series to DataFrame: 'Energy (eV)', 'Direct transition', and 'Indirect transition.'"""
     df['Energy (eV)'] = 1240 / df['Wavelength (nm)']
     df['Direct transition'] = (df['Absorbance'] * df['Energy (eV)']) ** 2
     if n == 0.5:
         df['Indirect transition'] = (df['Absorbance'] * df['Energy (eV)']) ** n
-    # Export excel and/or txt files, comment-uncomment if necessary.
-    # df.to_excel(i.replace('txt', 'xlsx'), 'Sheet1', index=False)
-    df.to_csv(file.replace('.txt', '_out.txt'), sep=',', index=False)
     return df
+
+
+def export_data_as_csv(df: pd.DataFrame, file_name: str) -> None:
+    """Export the DataFrame to a CSV file with comma as separator."""
+    df.to_csv(file_name.replace('.txt', '_out.txt'), sep=',', index=False)
 
 
 def absorption_plot(df: pd.DataFrame, file_name: str) -> None:
@@ -163,11 +168,13 @@ if __name__ == "__main__":
             print(f"{file} is already processed or generated")
             continue
         print(f'Running for {file}...')
-        # Read initial csv files from the current directory and make calculation
-        initial_df = data_reading()
+        # Read initial csv files from the current directory and make nessesary data transformation
+        initial_df = data_reading(file_name=file)
         # Get the type of semiconductor from user to determine Tauc indicator
         tauc_indicator = ask_semiconductor_type(file_name=file)
+        # Process and export data
         processed_df = data_processing(df=initial_df, n=tauc_indicator)
+        export_data_as_csv(df=initial_df, file_name=file)
         # Plot figures of the absorption spectra and Tauc transformation
         absorption_plot(df=processed_df, file_name=file)
         # Work with 'Direct/Indirect transition' series from DataFrame
