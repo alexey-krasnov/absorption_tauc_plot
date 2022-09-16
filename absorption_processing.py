@@ -5,6 +5,7 @@ extract band gap values for corresponding transition type, and plot figures"""
 
 import fnmatch
 import glob
+from typing import Generator
 import matplotlib.pyplot as plt
 import matplotlib.axes._axes as axes
 from matplotlib import ticker
@@ -88,7 +89,7 @@ def absorption_plot(df: pd.DataFrame, file_name: str) -> None:
     plt.savefig(file_name.replace('txt', 'png'), dpi=300)
 
 
-def tauc_generator(df: pd.DataFrame, n: float):
+def tauc_generator(df: pd.DataFrame, n: float) -> Generator:
     """Generator of pandas Series from processed Data Frame
     depending on type of semiconductor: direct or indirect """
     if n == 0.5:
@@ -130,7 +131,7 @@ def calc_band_gap(a: float, b: float, y_axis: pd.Series) -> float:
 
 def vizual_x(e_g: float, x_axis, max_index):
     """Return region of abscissa to plot a regression line"""
-    visualization_x = np.linspace(e_g, x_axis[max_index - 60], 2)
+    visualization_x = np.linspace(e_g, x_axis[max_index], 2)
     return visualization_x
 
 
