@@ -169,7 +169,7 @@ if __name__ == "__main__":
             print(f"{file} is already processed or generated")
             continue
         print(f'Running for {file}...')
-        # Read initial csv files from the current directory and make nessesary data transformation
+        # Read initial csv files from the current directory and make necessary data transformation
         initial_df = data_reading(file_name=file)
         # Get the type of semiconductor from user to determine Tauc indicator
         tauc_indicator = ask_semiconductor_type(file_name=file)
